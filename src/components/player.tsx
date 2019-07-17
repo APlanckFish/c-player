@@ -119,7 +119,7 @@ class Player extends React.Component<playerShape,stateShape> {
                     {/* <i className="iconfont icon-play"/> */}
                 </div>
                 {/* <div className="danmuView">{danmuElement}</div> */}
-                <canvas id="canvas" className="danmuView" width={this.props.width} height={this.props.height}></canvas>
+                {/* <canvas id="canvas" className="danmuView" width={this.props.width} height={this.props.height}></canvas> */}
                 <Danmuku></Danmuku>
             </div>
         );
@@ -266,8 +266,9 @@ class DanmuViewer2{
     private bottomCols: Array<any>;
     private timer?: NodeJS.Timer | null;
 
-    constructor(duration:number){
-        let canvas = document.getElementById('canvas') as HTMLCanvasElement;
+    constructor(canvas1: HTMLCanvasElement,duration:number){
+        // let canvas = document.getElementById('canvas') as HTMLCanvasElement;
+        let canvas = canvas1;
         this.canvas = canvas;
         let ctx = this.canvas.getContext('2d');
         this.ctx = ctx;
@@ -298,6 +299,7 @@ class DanmuViewer2{
         // if (!this.isSupport) {
         //   return;
         // }
+        console.log(this.danmus,'danmus')
         if (this.timer) {
           return;
         }
@@ -306,6 +308,7 @@ class DanmuViewer2{
             this.clearCanvas();
             this.ctx.save();
             const arr = this.danmus;
+            // debugger
             for (let i = 0, len = arr.length; i < len; i += 1) {
               if (arr[i].status) {
                 const { content, x, y } = arr[i];
@@ -499,7 +502,7 @@ interface danmukuProps{
     currentTime: number;
     loading: boolean;
     duration: number;
-    dc:any;
+    // dc:any;
 }
 interface danmukuContent{
     content: string,
@@ -510,32 +513,42 @@ interface danmukuContent{
 }
 
 class Danmuku extends React.Component<danmukuProps>{
-    // static danmuku: string;
-    // static playerAction: number;
-    // static currentTime: number;
-    // static loading: boolean;
-    // static duration: number;
-    // public dc: any;
+    public canvas:HTMLCanvasElement | null
+    public dc:DanmuViewer2 | null
     constructor (props:danmukuProps) {
         super(props)
+        // if(!this.canvas){
+        // this.canvas=document.querySelector('#canvas')
+        this.canvas=null
+        this.dc=null
+        // }
     }
     static defaultProps = {
         danmuku: [{
             content: 'test',
             date: 17,
-            timePoint: 0,
+            timePoint: 1,
             fontSize: 12,
             model: 'top'
         }],
-        playerAction: 480,
+        playerAction: 1,
         currentTime: false,
         loading: false,
         duration: 10,
-        dc: new DanmuViewer2(10)
+        // dc: new DanmuViewer2(this.canvas,10)
     }
     componentDidMount(){
+      // debugger
         // this.props.dc = new DanmuViewer2(10);
-        this.props.dc.draw();
+        this.canvas=document.querySelector('#canvas')
+        // debugger
+        if(this.canvas){
+          this.dc=new DanmuViewer2(this.canvas,10)
+        }
+        if(this.dc){
+          this.dc.draw();
+        }
+        this.runDanmuku();
     }
     // shouldComponentUpdate(nextProps) {
     //     if (nextProps.currentTime !== this.props.currentTime) {
@@ -553,13 +566,20 @@ class Danmuku extends React.Component<danmukuProps>{
     //     return false;
     //   }
     runDanmuku(){
-        const { danmuku, playerAction, currentTime, loading } = this.props;
-        if (playerAction === 1 && !loading) {
-          const data =
-            danmuku.filter(d => (Math.round(d.timePoint) === Math.round(currentTime)));
-          this.props.dc.addDanmuku(data);
-          this.props.dc.draw();
+      const { danmuku, playerAction, currentTime, loading } = this.props;
+      if (playerAction === 1 && !loading) {
+        const data =
+        danmuku.filter(d => (Math.round(d.timePoint) === Math.round(currentTime)));
+          if(this.dc){
+            this.dc.addDanmuku(data);
+            this.dc.draw();
+          }
         }
+    }
+    render() {
+      return (
+        <canvas id="canvas" className="danmuView" ref={node =>{this.canvas=node}}></canvas>
+      )
     }
 }
 
