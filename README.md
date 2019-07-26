@@ -1,44 +1,38 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+这是一个基于TypeScript的弹幕视频播放器。
 
-## Available Scripts
+![demo](E:\program\c-player\demo.png)
 
-In the project directory, you can run:
+展示地址https://APlanckFish.github.io/c-player。**由于该项目托管在github服务器，强烈建议使用VPN代理访问，否则可能导致网络超时，视频无法正常加载等情况。**
 
-### `npm start`
+## 初始化
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+组件导入后可直接引用。
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+````react
+const App: React.FC = () => {
+  return (
+    <div className="App">
+      <div className="title">C-player</div>
+      <div className="subTitle">一个基于typescript的弹幕播放器</div>
+      <header className="App-header">
+        <Player src={videos} poster={poster} danmuku={danmuku}></Player>
+      </header>
+    </div>
+  );
+}
+````
 
-### `npm test`
+弹幕格式如下
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```javascript
+var danmu = {
+    contnet: '测试弹幕',//内容
+    date: new Date(),//日期
+    timePoint: 1.0323,//出现时间
+    fontSize: 'middle',//字体大小 small middle large 或者输入字号
+    fontColor: 'white',//字体颜色 或者输入 #000000
+    model: 'roll'//模式分为 top,roll.bottom
+}
+```
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+此项目为静态页面。只包含前端部分，不涉及后端交互。
