@@ -6,7 +6,7 @@ import Player from './components/player';
 
 // const videos = require('./assets/video.mp4')
 const poster = require('./assets/test.jpg')
-const videos = require('./assets/video2.mp4')
+const videos = require('./assets/video.mp4')
 let danmuku:Array<any>;
 danmuku= [];
 
