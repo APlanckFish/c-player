@@ -2,7 +2,7 @@
 
 ![demo](http://github.com/APlanckFish/c-player/raw/master/demo.png)
 
-展示地址https://APlanckFish.github.io/c-player。
+展示地址https://APlanckFish.github.io/c-player
 
 **由于该项目托管在github服务器，强烈建议使用VPN代理访问，否则可能导致网络超时，视频无法正常加载等情况。**
 
