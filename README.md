@@ -1,6 +1,6 @@
 这是一个基于TypeScript的弹幕视频播放器。
 
-![demo](http://github.com/APlanckFish/c-player/raw/master/demo.png)
+![demo](https://github.com/APlanckFish/c-player/raw/master/demo.png)
 
 展示地址https://APlanckFish.github.io/c-player
 
