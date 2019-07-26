@@ -6,11 +6,17 @@ interface videoProps{
     preload: string,
     poster: string,
     handleOnLoadStart: ()=> void,
-    handleOnLoadedMetadata: (duration:number)=> void,
+    handleOnLoadedMetadata: (metaData:videoMetaData)=> void,
     handleOnLoadedData: ()=> void,
     handleOnCanPaly: ()=> void,
     handleOnWaiting: ()=> void,
     handleOnError: (error: MediaError)=> void,
+}
+
+interface videoMetaData{
+    duration: number,
+    width: number,
+    height: number
 }
 
 export default class Video extends Component<videoProps> {
@@ -39,8 +45,12 @@ export default class Video extends Component<videoProps> {
   
     onLoadedMetaData = () => {
       if(this.video){
-          const duration = this.video.duration;
-          this.props.handleOnLoadedMetadata(duration);
+          const obj = {
+            duration: this.video.duration,
+            width: this.video.clientWidth,
+            height: this.video.clientHeight
+          }
+          this.props.handleOnLoadedMetadata(obj);
       }
     }
   

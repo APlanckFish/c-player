@@ -1,31 +1,9 @@
 import * as React from 'react';
 import Video from './video'
 import './player.scss'
-// import { clearInterval } from 'timers';
- // eslint-disable-next-line
-// import * as danmaku from 'danmaku'
-// import * as DanmukuCanvas from '../utils/DanmukuCanvas'
-let danmus = [
-    {
-        showTime: '5',//出现时间s
-        mode: 'top',//顶端弹幕
-        fontSize: '12',//默认弹幕字号
-        fontColor: '#000000',//默认弹幕颜色
-        unix: '1563155107',//时间戳
-        pool: 0,//弹幕池 0普通 1字幕 2特殊
-        sendId: 0,//发送者id
-        content: '测试弹幕',//内容
-    },{
-        showTime: '2',//出现时间s
-        mode: 'top',//顶端弹幕
-        fontSize: '12',//默认弹幕字号
-        fontColor: '#000000',//默认弹幕颜色
-        unix: '1563155107',//时间戳
-        pool: 0,//弹幕池 0普通 1字幕 2特殊
-        sendId: 0,//发送者id
-        content: '测试弹幕2',//内容
-    }
-]
+import Slider from 'antd/es/slider';
+import Input from 'antd/es/input'
+
 
 interface playerShape {
     height: number,
@@ -33,6 +11,7 @@ interface playerShape {
     src: string,
     controls: boolean,
     poster: string,
+    danmuku: Array<any>
 }
 interface stateShape{
     // video: HTMLVideoElement | null,
@@ -43,13 +22,25 @@ interface stateShape{
       bufferedTime: number,
       // volume: number,
       muted: boolean,
-      // loop: boolean
+      // loop: boolean,
+      width: number,
+      height: number,
+      volume: number
     }
     playerAction: number,
     playerStatus: number,
     // canvas: DanmuViewer | null
     canvas: HTMLCanvasElement | null,
-    duration: number
+    duration: number,
+    process: number,
+    danmuInput: string,
+    danmuku: Array<any>
+}
+
+interface videoMetaData{
+  duration: number,
+  width: number,
+  height: number
 }
 
 class Player extends React.Component<playerShape,stateShape> {
@@ -66,11 +57,17 @@ class Player extends React.Component<playerShape,stateShape> {
               // volume: this.props.volume,
               muted: false,             // 是否关闭声音
               // loop: this.props.loop,  // 是否洗脑循环
+              width: 480,
+              height: 360,
+              volume: 100
             },
             playerAction: 0, // 0: 等待  1: 播放 2: 暂停  3: 拖放前进 4: 播放完毕
             playerStatus: 0,
             canvas: null,
-            duration: 0
+            duration: 0,
+            process: 0,
+            danmuInput: '',
+            danmuku: []
         };
         this.video=null;
         this.currentTimer=null;
@@ -81,38 +78,16 @@ class Player extends React.Component<playerShape,stateShape> {
         controls: false
     }
     componentDidMount () {
-        const video: HTMLVideoElement | null = document.querySelector('#video');
-        // this.setState({
-        //     video: video
-        // })
-        // console.log(document.getElementById('0'),'000000000')
-        // for (let danmu of danmus){
-        //     let danmuText: HTMLElement | null = document.getElementById(danmu.id)
-        //     if(danmuText){
-        //         danmuText.style.animationDelay=danmu.showTime
-        //         danmuText.style.fontSize=danmu.fontSize
-        //     }
-        // }
-        // let danmuViewer = new DanmuViewer(danmus);
-        // this.setState({
-        //     canvas: danmuViewer
-        // })
-        // danmuViewer.draw();
-        // const danmaku = new Danmaku();
+      if(this.props.danmuku){
+        this.setState({
+          danmuku: this.props.danmuku,
+        })
+        console.log(this.state.danmuku,'danmuku')
+      }
     }
+
     play () {
       const { video } = this.state;
-      // if (start) {
-      //   this.setState({
-      //     video: Object.assign(video, { playTimes: 1 }),
-      //     playerStatus: 2,
-      //     playerAction: 1,
-      //     controllerShow: true,
-      //     loading: false,
-      //   });
-      // } else {
-      //   this.setState({ playerAction: 1, loading: false });
-      // }
       this.setState({
         playerAction: 1
       })
@@ -120,18 +95,6 @@ class Player extends React.Component<playerShape,stateShape> {
         this.video.play();
       }
       this.startCurrentTimer();
-        // const video: HTMLVideoElement | null = document.querySelector('#video');
-        // if(this.state.video){
-        //     this.state.video.play()
-        //   }
-            // for(let danmu of danmus){
-            //     if(this.state.canvas){
-            //         this.state.canvas.shoot(danmu)
-            //     }
-            // }
-        // if(this.state.canvas){
-        //     this.state.canvas.controler()
-        // }
     }
     pause () {
         this.setState({ playerAction: 2 });
@@ -139,28 +102,27 @@ class Player extends React.Component<playerShape,stateShape> {
           this.video.pause();
           this.clearCurrentTimer();
         }
-        // if(this.state.video){
-        //     this.state.video.pause()
-        // }
-        // if(this.state.canvas){
-        //     this.state.canvas.pause()
-        // }
     }
     fullScreen () {
         // if(this.state.video){
         //     this.state.video.requestFullscreen();
         // }
     }
-    handleOnLoadedMetadata = (time:number) => {
+    handleOnLoadedMetadata = (metaData:videoMetaData) => {
       if (this.state.video&&this.state.video.playTimes === 0) {
         this.setState({
-          video: Object.assign(this.state.video, { duration: time }),
+          video: Object.assign(this.state.video, { duration: metaData.duration }),
         });
         console.log(this.state.video.duration,'duration')
       }
+      this.setState({
+        video: Object.assign(this.state.video, {width: metaData.width})
+      })
+      this.setState({
+        video: Object.assign(this.state.video, {height: metaData.height})
+      })
     }
     handleOnLoadStart() {
-
     }
     handleOnLoadedData() {
 
@@ -202,7 +164,9 @@ class Player extends React.Component<playerShape,stateShape> {
             video: Object.assign(this.state.video, { currentTime: this.video.getCurrentTime() }),
           });
         }
-        console.log(this.state.video.currentTime,'currentTime')
+        this.setState({
+            process: (this.state.video.currentTime/this.state.video.duration)*100
+        })
       }, 1000);
     }
   
@@ -212,28 +176,96 @@ class Player extends React.Component<playerShape,stateShape> {
       }
       this.currentTimer = null;
     }
-    render() {
-        //  
-        // let danmuElement:Array<any> = []
-        // for (let danmu of danmus){
-        //     danmuElement.push(
-        //         <div key={danmu.content} className="danmu danmuStyle" id={danmu.id}>{danmu.content}</div>
-        //     )
+    formatTime (s:number) {
+      let t:string = '';
+      if(s>-1){
+        // let hour = Math.floor(s/3600);
+        let min = Math.floor(s/60) % 60;
+        let sec = s % 60;
+        // debugger
+        // if(hour<10){
+        //   t='0'+hour+':';
+        // }else{
+        //   t= hour+':';
         // }
-        // poster={this.props.poster}
+        if(min<10){
+          t+="0";
+        }
+        t+=min+':';
+        if(sec<10){
+          t+='0';
+        }
+        // t+=sec.toFixed(0)
+        t+=Math.floor(sec);
+      }
+      return t
+    }
+    handleSliderChange (process:any) {
+      let currentTime = (process/100)*this.state.video.duration
+      if(this.video){
+        this.video.setCurrentTime(currentTime)
+      }
+      this.setState({
+        video: Object.assign(this.state.video, { currentTime: currentTime }),
+        process: process
+      })
+    }
+    changeInput (event:any) {
+      this.setState({
+        danmuInput: event.target.value
+      })
+    }
+    changeVolume (event:any) {
+      // console.log(event,'event')
+      this.setState({
+        video: Object.assign(this.state.video, { volume: event }),
+      })
+      if(this.video){
+        this.video.setVolume(event/100)
+      }
+      console.log(this.state.video.volume,'volume')
+    }
+    sendDanmu () {
+      console.log(this.state.danmuInput,'danmu')
+      let obj = {
+        content: this.state.danmuInput,
+        date: new Date(),
+        timePoint: this.state.video.currentTime+0.5,
+        fontSize: 'middle',
+        fontColor: 'white',
+        model: 'roll'
+      }
+      let nd = this.state.danmuku
+      nd.push(obj);
+      this.setState({
+        danmuku: nd,
+        danmuInput: ''
+      })
+    }
+    render() {
         return (
             <div className="videoView">
                 <Video handleOnLoadedMetadata={this.handleOnLoadedMetadata} src={this.props.src} poster={this.props.poster} handleOnLoadStart={this.handleOnLoadStart} handleOnLoadedData={this.handleOnLoadedData} handleOnCanPaly={this.handleOnCanPaly} handleOnWaiting={this.handleOnWaiting} handleOnError={this.handleOnError} ref={node=>{this.video=node}}></Video>
-                {/* <video height={this.props.height} width={this.props.width} controls={this.props.controls} src={this.props.src} id="video" onLoadedMetadata={this.onLoadedMetaData}></video> */}
+                <div className="processDiv">
+                  <div className="processBack"></div>
+                  <Slider value={this.state.process} onChange={this.handleSliderChange.bind(this)} min={0} max={100} className="processSlider"/>
+                </div>
                 <div className="controlBar">
-                    <div className="playBtn" onClick={this.play.bind(this)}></div>
-                    <div onClick={this.fullScreen.bind(this)}>全屏</div>
-                    <div onClick={this.pause.bind(this)}>暂停</div>
-                    {/* <i className="iconfont icon-play"/> */}
+                    {/* <div className="playBtn" onClick={this.play.bind(this)}></div> */}
+                    {this.state.playerAction==1?<i className="icon-zanting iconfont" onClick={this.pause.bind(this)}></i>:<i className="icon-play iconfont" onClick={this.play.bind(this)}></i>}
+                    <div className="currentTime">{this.formatTime(this.state.video.currentTime)}/</div>
+                    <div className="duration">{this.formatTime(this.state.video.duration)}</div>
+                    <Input placeholder="发个弹幕吐槽吧！" className="danmuInput" value={this.state.danmuInput} onChange={this.changeInput.bind(this)} onPressEnter={this.sendDanmu.bind(this)}></Input>
+                    <div className="voiceDiv">
+                      <i className="iconfont icon-yinliang"></i>
+                      <Slider vertical value={this.state.video.volume} onChange={this.changeVolume.bind(this)} className="voiceSlider"/>
+                      <div className="voiceBack"></div>
+                    </div>
+                    {/* <div onClick={this.fullScreen.bind(this)}>全屏</div> */}
                 </div>
                 {/* <div className="danmuView">{danmuElement}</div> */}
                 {/* <canvas id="canvas" className="danmuView" width={this.props.width} height={this.props.height}></canvas> */}
-                <Danmuku currentTime={this.state.video.currentTime} duration={this.state.video.duration} playerAction={this.state.playerAction}></Danmuku>
+                <Danmuku currentTime={this.state.video.currentTime} duration={this.state.video.duration} playerAction={this.state.playerAction} width={this.state.video.width} height={this.state.video.height} danmuku={this.state.danmuku}></Danmuku>
             </div>
         );
     }
@@ -368,8 +400,8 @@ class DanmuViewer2{
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D | null;
     public duration: number;
-    private canvasWidth: any;
-    private canvasHeight: any;
+    public canvasWidth: any;
+    public canvasHeight: any;
     private scale: number;
     private danmus: Array<any>;
     private col: number;
@@ -447,6 +479,7 @@ class DanmuViewer2{
                     }
                     break;
                   case 'top':
+                    // debugger
                     this.danmus[i].current = this.danmus[i].current + 30;
                     if (arr[i].current >= this.duration) {
                       this.danmus[i].status = false;
@@ -530,6 +563,7 @@ class DanmuViewer2{
       addDanmuku = (data:Array<any>) => {
         const newDanmuku = data.map((d) => {
           const danmukuData = this.formatData(d, false);
+          // debugger
           return danmukuData;
         });
         this.danmus = this.danmus.concat(newDanmuku);
@@ -609,7 +643,7 @@ class DanmuViewer2{
                 y: randomCol * 30,
                 textWidth: tw,
                 // speed: (distance / scale) / ((this.duration / 1000) * 33),
-                speed: 5,
+                speed: Math.random()*5+1,
                 insert: insertFlag,
                 current: 0,
                 status: true,
@@ -627,6 +661,8 @@ interface danmukuProps{
     currentTime: number;
     loading: boolean;
     duration: number;
+    width: number,
+    height: number
     // dc:any;
 }
 interface danmukuContent{
@@ -649,13 +685,21 @@ class Danmuku extends React.Component<danmukuProps>{
         // }
     }
     static defaultProps = {
-        danmuku: [{
-            content: 'test',
-            date: new Date(),
-            timePoint: 1,
-            fontSize: 12,
-            model: 'roll'
-        }],
+        // danmuku: [{
+        //   content: 'test',
+        //   date: new Date(),
+        //   timePoint: 1,
+        //   fontSize: 'middle',
+        //   fontColor: 'white',
+        //   model: 'roll'
+        // },{
+        //   content: 'test2',
+        //   date: new Date(),
+        //   timePoint: 1,
+        //   fontSize: 'middle',
+        //   fontColor: 'white',
+        //   model: 'roll'
+        // }],
         // playerAction: 1,
         // currentTime: 1,
         loading: false,
@@ -665,6 +709,7 @@ class Danmuku extends React.Component<danmukuProps>{
     componentDidMount(){
         // this.props.dc = new DanmuViewer2(10);
         this.canvas=document.querySelector('#canvas')
+        console.log(this.props,'props')
         if(this.canvas){
           this.dc=new DanmuViewer2(this.canvas,this.props.duration)
         }
@@ -676,6 +721,12 @@ class Danmuku extends React.Component<danmukuProps>{
     shouldComponentUpdate(nextProps:danmukuProps) {
         if(this.dc){
           this.dc.duration=nextProps.duration;
+          this.dc.canvasHeight=nextProps.height;
+          this.dc.canvasWidth=nextProps.width;
+        }
+        if(this.canvas){
+          this.canvas.width=nextProps.width;
+          this.canvas.height=nextProps.height;
         }
         if (nextProps.currentTime !== this.props.currentTime) {
           this.runDanmuku();
@@ -696,7 +747,8 @@ class Danmuku extends React.Component<danmukuProps>{
       if (playerAction === 1 && !loading) {
         const data =
         danmuku.filter(d => (Math.round(d.timePoint) === Math.round(currentTime)));
-          if(this.dc){
+        // danmuku.filter(d => (d.timePoint === currentTime));
+        if(this.dc){
             this.dc.addDanmuku(data);
             this.dc.draw();
           }
@@ -717,7 +769,7 @@ class Danmuku extends React.Component<danmukuProps>{
     }
     render() {
       return (
-        <canvas id="canvas" className="danmuView" ref={node =>{this.canvas=node}}></canvas>
+        <canvas id="canvas" className="danmuView" ref={node =>{this.canvas=node}} width={this.props.width} height={this.props.height}></canvas>
       )
     }
 }

@@ -1,3 +1,4 @@
+@import '~antd/dist/antd.css';
 .App {
   text-align: center;
 }
@@ -9,8 +10,8 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  /* background-color: #282c34; */
+  /* min-height: 100vh; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -34,4 +35,14 @@
 
 html body{
   overflow: hidden;
+}
+.title{
+  margin-top: 20px;
+  color: #32a852;
+  font-size: 30px;
+}
+.subTitle{
+  color: #32a852;
+  font-size: 26px;
+  margin-bottom: 20px;
 }
