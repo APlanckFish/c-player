@@ -1,8 +1,10 @@
 这是一个基于TypeScript的弹幕视频播放器。
 
-![demo](E:\program\c-player\demo.png)
+![demo](.\demo.png)
 
-展示地址https://APlanckFish.github.io/c-player。**由于该项目托管在github服务器，强烈建议使用VPN代理访问，否则可能导致网络超时，视频无法正常加载等情况。**
+展示地址https://APlanckFish.github.io/c-player。
+
+**由于该项目托管在github服务器，强烈建议使用VPN代理访问，否则可能导致网络超时，视频无法正常加载等情况。**
 
 ## 初始化
 
